@@ -69,6 +69,7 @@ body{
 
 #quiz{padding:calc(22px + var(--sat)) 24px calc(22px + var(--sab))}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.prev-btn{appearance:none;border:0;background:transparent;color:var(--ink-1);font-size:18px;cursor:pointer;padding:0 4px;font-family:inherit;line-height:1}
 .progress-text{font-size:13px;font-weight:600;color:var(--accent-2);letter-spacing:.06em}
 .bar{height:4px;border-radius:0;background:var(--border);overflow:hidden}
 .bar i{display:block;height:100%;border-radius:0;background:var(--accent);width:0%;transition:width .45s cubic-bezier(.16,1,.3,1)}
@@ -147,6 +148,7 @@ body{
 
     <section class="screen" id="quiz">
       <div class="topbar">
+        <button class="prev-btn" id="prevBtn">←</button>
         <span class="progress-text" id="progText">1 / 24</span>
         <span class="progress-text" style="color:var(--ink-3)">CatTi</span>
       </div>
@@ -209,22 +211,22 @@ const BREEDS = {
   silver:{n:"银渐层", t:"微微一闹很麻麻", c:"#8F9AA3", pair:"orange", combo:"又坏又萌×心宽", buddy:"cow", tags:["手欠","傲娇","又坏又萌"],
     d:"靠近你就靠近了闹麻，远离你就远离了耍起…总在对方的底线反复横跳，又总因为你的人格魅力拒绝不了你。和你一起，总让人觉得天天很开心、很有趣，你总有想不尽的新点子。"},
   cow:{n:"奶牛猫", t:"哪来的d*cksuck", c:"#4a4a4c", pair:"black", combo:"冰山×护短", buddy:"orange", tags:["神经质","护短","靠谱"],
-    d:"到底是哪个傻*赐予了我深度思考的能力，现在既没有成为苏格拉底，也没法继续当幸福的猪。无意轻浮的谈情说爱，但会以雷霆之姿守护老子心肝。"},
+    d:"到底是哪个傻*赐予了我深度思考的能力，现在既没有成为苏格拉底，也没法继续当幸福的猪。无意轻浮的谈情说爱，但会꧁༺以雷霆之姿守护老子心肝༻꧂"},
   ragdoll:{n:"布偶", t:"占有欲是不是太弱了？", c:"#C9B6A8", pair:"golden", combo:"稳定×躺平", buddy:"siamese", tags:["软糯","粘人","躺平"],
     d:"天大地大老婆最大！吃什么、去哪、周末干嘛，什么时候都想和对方在一起。离开老婆就活不了啦，我是老婆奴，没有她的日子根本不能成为人生…"},
   siamese:{n:"暹罗", t:"妈妈级别", c:"#B08A66", pair:"tabby", combo:"年上的神", buddy:"ragdoll", tags:["体贴","照顾","服务型"],
     d:"20岁被妈妈打很丢人，那被20岁的妈妈打呢？完全魅魔来了，被身边的人前仆后继地爱上。不忍心每个女孩落泪只是我的本能，但人缘是不是有点太好了。"},
-  tabby:{n:"狸花", t:"铁t来了", c:"#8A7763", pair:"siamese", combo:"透视你的心口不一", buddy:"golden", tags:["靠谱","外冷内热","扛事"],
+  tabby:{n:"狸花", t:"年上的神", c:"#8A7763", pair:"siamese", combo:"透视你的心口不一", buddy:"golden", tags:["靠谱","外冷内热","扛事"],
     d:"被女人依赖？我的人生一直如此。可能有时候会被人说有点凶，但手底下什么都替她想到。她慌了你就一句「我在」。别人问你累不累，你永远一句「我没事」。"},
   orange:{n:"橘猫", t:"淡淡的会顺顺的", c:"#e8926a", pair:"silver", combo:"又坏又萌×心宽", buddy:"cow", tags:["心宽","美食家","享福"],
-    d:"你跟我一起，不用费力找话题，我们可以并肩走走，或者各自发呆。舒服的关系大概就是这样，不需要太多声音，也能感觉到彼此的存在。"}
+    d:"你跟我一起，不用费力找话题，我们可以并肩走走，或者各自发呆。舒服的关系大概就是这样，不需要太多声音，也能感觉到彼此的存在(*/ω＼*)。"}
 };
 
 const QUIZ = [
   {label:"01 · 冷战", title:"你们吵架了，好几小时没说话。你？",
    opts:[["先去忙自己的事，等双方冷静慢慢聊","black"],["焦虑得什么都做不好，先去找ta","ragdoll"],["时不时发表情包，试探一下","golden"]]},
   {label:"02 · 吃醋", title:"ta跟别人聊得热火朝天，忽略了你，你会？",
-   opts:[["凑过去，手往ta腰上一搭","siamese"],["面上不吭声，心里默默记","black"],["玩的开心就好，尊重对方社交","orange"]]},
+   opts:[["他是谁？怎么认识的？有很重要的事情吗？我在你旁边，你和他聊？","siamese"],["面上不吭声，心里默默记，人生最重要的是体面","black"],["对方可能太久没见朋友了，试图加入","orange"]]},
   {label:"03 · 买单", title:"出去吃饭结账，你？",
    opts:[["我来，为老婆花钱天经地义","tabby"],["狠狠依赖一把","orange"],["有来有回","golden"]]},
   {label:"04 · 收礼", title:"她送了你一个不便宜的东西，你？",
@@ -234,7 +236,7 @@ const QUIZ = [
   {label:"06 · 分手", title:"她说要分手，你？",
    opts:[["炸了，凭什么，什么原因","cow"],["可以好好沟通聊一下吗？","golden"],["嘴上说好，一个人扛着痛苦","tabby"]]},
   {label:"07 · 前任", title:"她前任回来找她了，你？",
-   opts:[["疯狂刷新在对方面前展现占有","siamese"],["背后默默看她的反应和举止","black"],["她是我的，难道还会跑吗","orange"]]},
+   opts:[["你是不是想死？魅力真大啊，对你念念不忘呢。","siamese"],["背后默默看她的反应和举止","black"],["看看具体要发生什么事情，我相信她对我的爱","orange"]]},
   {label:"08 · 同居", title:"你们要搬到一起住，你？",
    opts:[["会不会少了距离感，同居后更多矛盾？","cow"],["幸福的开始幻想看海养猫一辈子","ragdoll"],["我来安排，包在我身上","tabby"]]},
   {label:"09 · 手机", title:"会不会偷偷看她手机？",
@@ -251,7 +253,7 @@ const QUIZ = [
    opts:[["话痨，什么都发，点赞必回","cow"],["我会永远视奸你.jpg，会暗戳戳评论逗人","silver"],["只看不发，只和亲近的人互动","ragdoll"]]},
   {label:"15 · 喜欢", title:"喜欢一个人，你会？",
    opts:[["害怕朋友都做不了，忍者","black"],["如果能在对方身边，什么身份都可以，天天粘着","ragdoll"],["不管了梭哈，直接a上去","cow"]]},
-  {label:"16 · 亲密", title:"亲密的时候，你？",
+  {label:"16 · 亲密", title:"难得的小长假一起出去玩，你？",
    opts:[["爱逗她，看她害羞","silver"],["狠狠腻歪，一直抱抱亲亲","ragdoll"],["把她照顾好，服务型人格","tabby"]]},
   {label:"17 · 低落", title:"你情绪低落的时候，会？",
    opts:[["找ta陪伴着自己","golden"],["顾着照顾别人，不希望他人担心自己","siamese"],["没事，什么能过不去啊","tabby"]]},
@@ -283,7 +285,7 @@ mountCat("coverCat");
 
 function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
 
-let idx=0, score={}, picked=null;
+let idx=0, score={}, picked=null, answers={};
 const $=s=>document.querySelector(s);
 const screens={cover:$("#cover"),quiz:$("#quiz"),result:$("#result"),gallery:$("#gallery")};
 function show(name){Object.values(screens).forEach(s=>s.classList.remove("active"));screens[name].classList.add("active");}
@@ -294,6 +296,7 @@ function renderQ(){
   $("#barFill").style.width=`${((idx+1)/QUIZ.length)*100}%`;
   $("#qLabel").textContent=q.label;
   $("#qTitle").textContent=q.title;
+  $("#prevBtn").style.visibility = idx===0 ? "hidden" : "visible";
   const opts=$("#opts"); opts.innerHTML="";
   picked=null;
   q.opts.forEach(([txt,key])=>{
@@ -304,6 +307,7 @@ function renderQ(){
       opts.querySelectorAll(".opt").forEach(o=>o.classList.remove("pick"));
       b.classList.add("pick");
       picked=key;
+      answers[idx]=key;
       score[key]=(score[key]||0)+1;
       setTimeout(()=>{ idx++; if(idx<QUIZ.length)renderQ(); else showResult(); }, 300);
     };
@@ -311,6 +315,14 @@ function renderQ(){
   });
   mountCat("qCat");
 }
+
+$("#prevBtn").onclick=()=>{
+  if(idx===0) return;
+  if(answers[idx]){ score[answers[idx]]--; delete answers[idx]; }
+  idx--;
+  if(answers[idx]){ score[answers[idx]]--; delete answers[idx]; }
+  renderQ();
+};
 
 function showResult(){
   const sorted=Object.entries(score).sort((a,b)=>b[1]-a[1]);
