@@ -297,7 +297,7 @@ mountCat("coverCat");
 
 function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
 
-let idx=0, score={}, picked=null, answers={};
+let idx=0, score={}, picked=null, answers={}, resultText="";
 const $=s=>document.querySelector(s);
 const screens={cover:$("#cover"),quiz:$("#quiz"),result:$("#result"),gallery:$("#gallery")};
 function show(name){Object.values(screens).forEach(s=>s.classList.remove("active"));screens[name].classList.add("active");}
@@ -343,6 +343,7 @@ function showResult(){
   const topCats=sorted.filter(([k,v])=>v===topScore).map(([k])=>k);
   const main=topCats[0], extras=topCats.slice(1);
   const b=BREEDS[main];
+  resultText=`我测出来是「${b.n}·${b.t}」${extras.length>0?`，还带点 ${extras.map(k=>BREEDS[k].n).join("、")} 的影子`:""}，你也来测测`;
   $("#banner").style.background=`linear-gradient(180deg, ${hexA(b.c,0.20)}, ${hexA(b.c,0.04)} 55%, transparent)`;
   $("#resName").textContent=b.n;
   $("#resTitle").textContent="—— "+b.t;
@@ -401,14 +402,35 @@ function renderChart(){
   }).join("");
 }
 
+function copyToClipboard(text){
+  return new Promise((resolve,reject)=>{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(()=>{ alert("已复制，去微信/抖音粘贴发送吧"); resolve(); }).catch(reject);
+    } else {
+      const ta=document.createElement("textarea");
+      ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand("copy"); alert("已复制，去粘贴发送吧"); resolve(); }
+      catch(e){ reject(e); }
+      document.body.removeChild(ta);
+    }
+  });
+}
+
 $("#shareBtn").onclick=async()=>{
   const url="https://exoticflicker.github.io/cati";
-  const text="测测你的 cati · 测测你是什么小猫(￣﹃￣)";
+  const shareText=resultText||"测测你是什么小猫(￣﹃￣)";
+  const copyText=`${shareText} ${url}`;
   try{
-    if(navigator.share){ await navigator.share({title:"测测你的 cati", text, url}); }
-    else if(navigator.clipboard){ await navigator.clipboard.writeText(url+" · "+text); alert("链接已复制，去发给朋友吧"); }
-    else{ prompt("复制链接分享：", url); }
-  }catch(e){}
+    if(navigator.share){
+      await navigator.share({title:"测测你的 cati", text:shareText, url});
+    } else {
+      await copyToClipboard(copyText);
+    }
+  }catch(e){
+    // navigator.share 被取消或不支持 → 降级复制
+    if(!navigator.share){ try{ await copyToClipboard(copyText); }catch(e2){} }
+  }
 };
 </script>
 </body>
