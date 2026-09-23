@@ -62,7 +62,7 @@ body{
   transition:transform .18s cubic-bezier(.16,1,.3,1), box-shadow .18s ease;
 }
 .btn:active{transform:scale(.97)}
-.btn.ghost{background:transparent;color:var(--ink-2);box-shadow:none;font-weight:500;font-size:15px;padding:12px 20px}
+.btn.ghost{background:var(--bg);color:var(--ink-1);border:1px solid var(--ink-1);box-shadow:none;font-weight:600;font-size:15px;padding:14px 20px}
 .hint{margin-top:18px;font-size:12px;color:var(--ink-3);letter-spacing:.05em}
 .cover-wave{position:absolute;left:0;right:0;bottom:0;height:110px;pointer-events:none;opacity:.5}
 .cover-wave path{fill:var(--accent-2)}
@@ -109,6 +109,14 @@ body{
 .sub-cats{margin-top:14px;display:flex;flex-direction:column;gap:10px}
 .sub-cat{background:var(--panel-2);border:1px solid var(--border);border-radius:0;padding:14px 16px;font-size:15px;color:var(--ink-2);text-align:left;line-height:1.6}
 .sub-cat b{color:var(--ink-1);font-weight:600}
+.chart-box{margin-top:16px;background:var(--bg);border:1px solid var(--border);border-radius:0;padding:16px}
+.chart-title{font-size:13px;font-weight:600;color:var(--ink-1);margin-bottom:12px}
+.chart{display:flex;gap:6px;align-items:flex-end}
+.bar-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.bar-track{width:100%;height:110px;display:flex;align-items:flex-end;background:var(--panel-2)}
+.bar-fill{width:100%;background:var(--accent);min-height:2px}
+.bar-label{font-size:10px;color:var(--ink-3)}
+.bar-val{font-size:10px;color:var(--ink-2)}
 .pair-box{margin-top:16px;display:flex;flex-direction:column;gap:10px}
 .pair-item{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 16px;font-size:15px;color:var(--ink-2);text-align:left;line-height:1.6}
 .pair-item b{color:var(--ink-1);font-weight:600}
@@ -143,7 +151,7 @@ body{
       <p class="cover-sub">测测你是什么小猫(￣﹃￣)</p>
       <div class="cat-stage" id="coverCat"></div>
       <button class="btn" id="startBtn">开始测试</button>
-      <div class="hint">24 个问题 · 认真想想</div>
+      <div class="hint">1min 测测你是什么性格的小猫</div>
     </section>
 
     <section class="screen" id="quiz">
@@ -171,6 +179,10 @@ body{
       <div class="res-body">
         <div class="res-desc" id="resDesc"></div>
         <div class="sub-cats" id="subCats" style="display:none"></div>
+        <div class="chart-box">
+          <div class="chart-title">你的性格八维</div>
+          <div class="chart" id="chart"></div>
+        </div>
         <div class="tags" id="resTags"></div>
         <div class="pair-box">
           <div class="pair-item" id="pairLine"></div>
@@ -178,11 +190,11 @@ body{
         </div>
       </div>
       <div class="actions">
-        <button class="btn" id="shareBtn">分享给朋友</button>
         <div class="action-row">
           <button class="btn ghost" id="againBtn">再测一次</button>
           <button class="btn ghost" id="galleryBtn">猫猫图鉴</button>
         </div>
+        <button class="btn" id="shareBtn">分享给朋友</button>
       </div>
       <div class="share-note">分享链接会带上你的结果，朋友点开就能看</div>
     </section>
@@ -348,6 +360,7 @@ function showResult(){
   } else {
     $("#subCats").style.display="none";
   }
+  renderChart();
   mountCat("resCat");
   show("result");
 }
@@ -373,6 +386,20 @@ function renderGallery(){
 }
 $("#galleryBtn").onclick=()=>{ renderGallery(); show("gallery"); };
 $("#galleryBack").onclick=()=>{ show("result"); };
+
+function renderChart(){
+  const dims=[["black","慢热"],["golden","温和"],["silver","手欠"],["cow","神经质"],["ragdoll","粘人"],["siamese","服务型"],["tabby","靠谱"],["orange","淡淡的"]];
+  const maxScore=Math.max(1,...Object.values(score));
+  $("#chart").innerHTML=dims.map(([k,label])=>{
+    const v=score[k]||0;
+    const h=Math.round(v/maxScore*100);
+    return `<div class="bar-item">
+      <div class="bar-track"><div class="bar-fill" style="height:${h}%"></div></div>
+      <div class="bar-label">${label}</div>
+      <div class="bar-val">${v}</div>
+    </div>`;
+  }).join("");
+}
 
 $("#shareBtn").onclick=async()=>{
   const url="https://exoticflicker.github.io/cati";
