@@ -105,6 +105,9 @@ body{
   background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px 20px;box-shadow:var(--shadow);font-weight:400}
 .tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
 .tag{font-size:13px;color:var(--ink-2);background:var(--panel-2);border:1px solid var(--border);border-radius:0;padding:6px 14px;font-weight:500}
+.sub-cats{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.sub-cat{background:var(--panel-2);border:1px solid var(--border);border-radius:0;padding:14px 16px;font-size:15px;color:var(--ink-2);text-align:left;line-height:1.6}
+.sub-cat b{color:var(--ink-1);font-weight:600}
 .pair-box{margin-top:16px;display:flex;flex-direction:column;gap:10px}
 .pair-item{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 16px;font-size:15px;color:var(--ink-2);text-align:left;line-height:1.6}
 .pair-item b{color:var(--ink-1);font-weight:600}
@@ -149,6 +152,7 @@ body{
       </div>
       <div class="res-body">
         <div class="res-desc" id="resDesc"></div>
+        <div class="sub-cats" id="subCats" style="display:none"></div>
         <div class="tags" id="resTags"></div>
         <div class="pair-box">
           <div class="pair-item" id="pairLine"></div>
@@ -282,10 +286,12 @@ function renderQ(){
 }
 
 function showResult(){
-  let best=null,top=0;
-  Object.entries(score).forEach(([k,v])=>{ if(v>top){top=v;best=k;} });
-  if(!best) best="golden";
-  const b=BREEDS[best];
+  const sorted=Object.entries(score).sort((a,b)=>b[1]-a[1]);
+  if(sorted.length===0) sorted=[["golden",0]];
+  const topScore=sorted[0][1];
+  const topCats=sorted.filter(([k,v])=>v===topScore).map(([k])=>k);
+  const main=topCats[0], extras=topCats.slice(1);
+  const b=BREEDS[main];
   $("#banner").style.background=`linear-gradient(180deg, ${hexA(b.c,0.20)}, ${hexA(b.c,0.04)} 55%, transparent)`;
   $("#resName").textContent=b.n;
   $("#resTitle").textContent="—— "+b.t;
@@ -294,6 +300,15 @@ function showResult(){
   const p=BREEDS[b.pair], bd=BREEDS[b.buddy];
   $("#pairLine").innerHTML=`最佳配对小猫：<b>${p.n}·${p.t}</b>（${b.combo}）`;
   $("#buddyLine").innerHTML=`最佳友伴小猫：<b>${bd.n}·${bd.t}</b>`;
+  if(extras.length>0){
+    $("#subCats").innerHTML=extras.map(k=>{
+      const e=BREEDS[k];
+      return `<div class="sub-cat">你身上还带点 <b>${e.n}·${e.t}</b> 的影子</div>`;
+    }).join("");
+    $("#subCats").style.display="flex";
+  } else {
+    $("#subCats").style.display="none";
+  }
   mountCat("resCat");
   show("result");
 }
