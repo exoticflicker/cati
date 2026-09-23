@@ -419,18 +419,17 @@ function copyToClipboard(text){
 
 $("#shareBtn").onclick=async()=>{
   const url="https://exoticflicker.github.io/cati";
-  const shareText=resultText||"测测你是什么小猫(￣﹃￣)";
-  const copyText=`${shareText} ${url}`;
-  try{
-    if(navigator.share){
+  const shareText=(resultText||"测测你是什么小猫(￣﹃￣)")+" "+url;
+  if(navigator.share){
+    try{
       await navigator.share({title:"测测你的 cati", text:shareText, url});
-    } else {
-      await copyToClipboard(copyText);
+      return;
+    }catch(e){
+      if(e && e.name==="AbortError") return; // 用户主动取消，不降级
     }
-  }catch(e){
-    // navigator.share 被取消或不支持 → 降级复制
-    if(!navigator.share){ try{ await copyToClipboard(copyText); }catch(e2){} }
   }
+  // 分享失败或不支持 → 复制到剪贴板
+  try{ await copyToClipboard(shareText); }catch(e){}
 };
 </script>
 </body>
