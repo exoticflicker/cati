@@ -112,7 +112,23 @@ body{
 .pair-item{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 16px;font-size:15px;color:var(--ink-2);text-align:left;line-height:1.6}
 .pair-item b{color:var(--ink-1);font-weight:600}
 .actions{display:flex;flex-direction:column;gap:10px;margin:24px 24px 0}
+.action-row{display:flex;gap:10px}
+.action-row .btn{flex:1}
 .share-note{font-size:12px;color:var(--ink-3);margin-top:10px;text-align:center}
+
+#gallery{padding:calc(20px + var(--sat)) 24px calc(24px + var(--sab));overflow-y:auto}
+.gallery-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.g-back{appearance:none;border:1px solid var(--border);background:transparent;color:var(--ink-1);padding:8px 16px;border-radius:0;cursor:pointer;font-family:inherit;font-size:14px}
+.g-title{font-size:18px;font-weight:600;color:var(--ink-1)}
+.gallery-list{display:flex;flex-direction:column;gap:14px}
+.g-card{border:1px solid var(--border);background:var(--bg);border-radius:0;padding:18px}
+.g-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.g-dot{width:14px;height:14px;border-radius:0;flex:0 0 auto;margin-top:4px}
+.g-name{font-size:17px;font-weight:700;color:var(--ink-1)}
+.g-tags{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+.g-tag{font-size:11px;color:var(--ink-3);border:1px solid var(--border);padding:2px 8px;border-radius:0}
+.g-desc{font-size:14px;line-height:1.8;color:var(--ink-2)}
+.g-pair{margin-top:10px;font-size:13px;color:var(--ink-3)}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.screen{transition:none}}
 </style>
@@ -161,9 +177,20 @@ body{
       </div>
       <div class="actions">
         <button class="btn" id="shareBtn">分享给朋友</button>
-        <button class="btn ghost" id="againBtn">再测一次</button>
+        <div class="action-row">
+          <button class="btn ghost" id="againBtn">再测一次</button>
+          <button class="btn ghost" id="galleryBtn">猫猫图鉴</button>
+        </div>
       </div>
       <div class="share-note">分享链接会带上你的结果，朋友点开就能看</div>
+    </section>
+
+    <section class="screen" id="gallery">
+      <div class="gallery-head">
+        <button class="g-back" id="galleryBack">← 返回</button>
+        <div class="g-title">猫猫图鉴</div>
+      </div>
+      <div class="gallery-list" id="galleryList"></div>
     </section>
 
   </div>
@@ -258,7 +285,7 @@ function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16&25
 
 let idx=0, score={}, picked=null;
 const $=s=>document.querySelector(s);
-const screens={cover:$("#cover"),quiz:$("#quiz"),result:$("#result")};
+const screens={cover:$("#cover"),quiz:$("#quiz"),result:$("#result"),gallery:$("#gallery")};
 function show(name){Object.values(screens).forEach(s=>s.classList.remove("active"));screens[name].classList.add("active");}
 
 function renderQ(){
@@ -315,6 +342,25 @@ function showResult(){
 
 $("#startBtn").onclick=()=>{ score={}; idx=0; renderQ(); show("quiz"); };
 $("#againBtn").onclick=()=>{ score={}; idx=0; renderQ(); show("quiz"); };
+
+function renderGallery(){
+  $("#galleryList").innerHTML=Object.entries(BREEDS).map(([k,b])=>{
+    const p=BREEDS[b.pair], bd=BREEDS[b.buddy];
+    return `<div class="g-card">
+      <div class="g-head">
+        <span class="g-dot" style="background:${b.c}"></span>
+        <div>
+          <div class="g-name">${b.n} · ${b.t}</div>
+          <div class="g-tags">${b.tags.map(t=>`<span class="g-tag">${t}</span>`).join("")}</div>
+        </div>
+      </div>
+      <div class="g-desc">${b.d}</div>
+      <div class="g-pair">最佳配对：${p.n}（${b.combo}）｜最佳友伴：${bd.n}</div>
+    </div>`;
+  }).join("");
+}
+$("#galleryBtn").onclick=()=>{ renderGallery(); show("gallery"); };
+$("#galleryBack").onclick=()=>{ show("result"); };
 
 $("#shareBtn").onclick=async()=>{
   const url="https://exoticflicker.github.io/cati";
