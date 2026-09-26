@@ -364,6 +364,7 @@ function showResult(){
   renderChart();
   mountCat("resCat");
   show("result");
+  try{ fetch("https://api.countapi.xyz/hit/exoticflicker-cati/completed").catch(()=>{}); }catch(e){}
 }
 
 $("#startBtn").onclick=()=>{ score={}; idx=0; renderQ(); show("quiz"); };
