@@ -6,35 +6,56 @@
 <title>cati · 数据</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#F4F2EC;color:#2A2A28;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;-webkit-font-smoothing:antialiased}
-.box{text-align:center;padding:0 24px}
-.num{font-size:clamp(72px,18vw,128px);font-weight:700;letter-spacing:-.02em;line-height:1}
-.label{margin-top:14px;font-size:14px;letter-spacing:.3em;color:#7C7B76}
-.sub{margin-top:28px;font-size:13px;color:#9a988f;letter-spacing:.05em;line-height:1.9}
+body{background:#F4F2EC;color:#2A2A28;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;-webkit-font-smoothing:antialiased;padding:32px 0}
+.wrap{width:100%;max-width:420px;padding:0 28px}
+.head{text-align:center;margin-bottom:36px}
+.num{font-size:clamp(64px,16vw,104px);font-weight:700;letter-spacing:-.02em;line-height:1}
+.label{margin-top:12px;font-size:13px;letter-spacing:.3em;color:#7C7B76}
+.sub{margin-top:18px;font-size:12px;color:#9a988f;letter-spacing:.05em}
+.dist-title{font-size:12px;letter-spacing:.2em;color:#9a988f;margin-bottom:16px}
+.row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.name{width:52px;font-size:13px;color:#2A2A28;flex:0 0 auto;text-align:right}
+.bar-wrap{flex:1;height:8px;background:#EDEAE2;overflow:hidden}
+.bar{height:100%;background:#2A2A28;width:0;transition:width .4s ease}
+.count{width:28px;font-size:13px;color:#7C7B76;flex:0 0 auto;text-align:right}
 </style>
 </head>
 <body>
-<div class="box">
-  <div class="num" id="num">—</div>
-  <div class="label">人 完 成 测 试</div>
-  <div class="sub" id="sub">加载中…</div>
+<div class="wrap">
+  <div class="head">
+    <div class="num" id="num">—</div>
+    <div class="label">人 完 成 测 试</div>
+    <div class="sub" id="sub">加载中…</div>
+  </div>
+  <div class="dist-title">各 种 猫 分 布</div>
+  <div id="dist"></div>
 </div>
 <script>
+const CATS=[["black","孟买猫"],["golden","金渐层"],["silver","银渐层"],["cow","奶牛猫"],["ragdoll","布偶"],["siamese","暹罗"],["tabby","狸花"],["orange","橘猫"]];
+async function getVal(name){
+  try{
+    const r=await fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+name+"&mode=total&no_increment=1&format=json");
+    const j=await r.json();
+    return j.data && j.data.record ? j.data.record.total : 0;
+  }catch(e){ return 0; }
+}
 async function load(){
+  const total=await getVal("completed");
+  const vals={};
+  for(const [k,n] of CATS){ vals[k]=await getVal(k); }
+  document.getElementById("num").textContent=total;
+  // 今日新增
   try{
     const r=await fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=completed&mode=total&no_increment=1&format=json");
     const j=await r.json();
-    const d=j.data;
-    const total=d.record.total;
-    const daily=d.record.daily;
-    const up=d.record.updated_at||"";
-    const dt=up.replace("T"," ").slice(5,16);
-    document.getElementById("num").textContent=total;
-    document.getElementById("sub").innerHTML=`今日 +${daily}<br>最后测试 · ${dt}`;
-  }catch(e){
-    document.getElementById("num").textContent="—";
-    document.getElementById("sub").textContent="加载失败，稍后刷新";
-  }
+    const d=j.data; const daily=d.record.daily; const up=d.record.updated_at||"";
+    document.getElementById("sub").innerHTML=`今日 +${daily} · 最后测试 ${up.replace("T"," ").slice(5,16)}`;
+  }catch(e){}
+  const max=Math.max(1,...Object.values(vals));
+  document.getElementById("dist").innerHTML=CATS.map(([k,n])=>{
+    const v=vals[k]||0;
+    return `<div class="row"><span class="name">${n}</span><span class="bar-wrap"><span class="bar" style="width:${Math.round(v/max*100)}%"></span></span><span class="count">${v}</span></div>`;
+  }).join("");
 }
 load();
 </script>
