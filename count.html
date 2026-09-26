@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cati · 数据</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#F4F2EC;color:#2A2A28;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;-webkit-font-smoothing:antialiased}
+.box{text-align:center;padding:0 24px}
+.num{font-size:clamp(72px,18vw,128px);font-weight:700;letter-spacing:-.02em;line-height:1}
+.label{margin-top:14px;font-size:14px;letter-spacing:.3em;color:#7C7B76}
+.note{margin-top:32px;font-size:11px;color:#9a988f;letter-spacing:.08em}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="num" id="num">—</div>
+  <div class="label">人 完 成 测 试</div>
+  <div class="note">打开即刷新 · 数据来自 apizero.cn</div>
+</div>
+<script>
+async function load(){
+  try{
+    const r=await fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=completed&mode=total&no_increment=1&format=json");
+    const j=await r.json();
+    const v=(j.data&&j.data.record)?j.data.record.total:(j.data?j.data.value:"—");
+    document.getElementById("num").textContent=v;
+  }catch(e){
+    document.getElementById("num").textContent="—";
+    document.querySelector(".note").textContent="加载失败，稍后刷新";
+  }
+}
+load();
+</script>
+</body>
+</html>
