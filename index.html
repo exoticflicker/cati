@@ -141,6 +141,15 @@ body{
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.screen{transition:none}}
 </style>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?8af946f2bad81bf688f9ab0b0a311162";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
 </head>
 <body>
 <div class="phone">
@@ -364,6 +373,7 @@ function showResult(){
   renderChart();
   mountCat("resCat");
   show("result");
+  try{ _hmt.push(['_trackEvent','test','completed',b.n]); }catch(e){}
   try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=completed&mode=total").catch(()=>{}); }catch(e){}
 }
 
