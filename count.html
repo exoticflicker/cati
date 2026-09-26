@@ -10,25 +10,30 @@ body{background:#F4F2EC;color:#2A2A28;font-family:-apple-system,BlinkMacSystemFo
 .box{text-align:center;padding:0 24px}
 .num{font-size:clamp(72px,18vw,128px);font-weight:700;letter-spacing:-.02em;line-height:1}
 .label{margin-top:14px;font-size:14px;letter-spacing:.3em;color:#7C7B76}
-.note{margin-top:32px;font-size:11px;color:#9a988f;letter-spacing:.08em}
+.sub{margin-top:28px;font-size:13px;color:#9a988f;letter-spacing:.05em;line-height:1.9}
 </style>
 </head>
 <body>
 <div class="box">
   <div class="num" id="num">—</div>
   <div class="label">人 完 成 测 试</div>
-  <div class="note">打开即刷新 · 数据来自 apizero.cn</div>
+  <div class="sub" id="sub">加载中…</div>
 </div>
 <script>
 async function load(){
   try{
     const r=await fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=completed&mode=total&no_increment=1&format=json");
     const j=await r.json();
-    const v=(j.data&&j.data.record)?j.data.record.total:(j.data?j.data.value:"—");
-    document.getElementById("num").textContent=v;
+    const d=j.data;
+    const total=d.record.total;
+    const daily=d.record.daily;
+    const up=d.record.updated_at||"";
+    const dt=up.replace("T"," ").slice(5,16);
+    document.getElementById("num").textContent=total;
+    document.getElementById("sub").innerHTML=`今日 +${daily}<br>最后测试 · ${dt}`;
   }catch(e){
     document.getElementById("num").textContent="—";
-    document.querySelector(".note").textContent="加载失败，稍后刷新";
+    document.getElementById("sub").textContent="加载失败，稍后刷新";
   }
 }
 load();
