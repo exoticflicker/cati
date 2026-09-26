@@ -375,6 +375,7 @@ function showResult(){
   show("result");
   try{ _hmt.push(['_trackEvent','test','completed',b.n]); }catch(e){}
   try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=completed&mode=total").catch(()=>{}); }catch(e){}
+  try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+main+"&mode=total").catch(()=>{}); }catch(e){}
 }
 
 $("#startBtn").onclick=()=>{ score={}; idx=0; renderQ(); show("quiz"); };
