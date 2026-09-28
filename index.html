@@ -208,7 +208,7 @@ var _hmt = _hmt || [];
           <div class="pair-item" id="buddyLine"></div>
         </div>
       </div>
-      <div class="res-count" id="resCount"></div>
+      <div class="res-count" id="resCount">小猫大军集合中…</div>
       <div class="actions">
         <div class="action-row">
           <button class="btn ghost" id="againBtn">再测一次</button>
@@ -409,9 +409,10 @@ function showResult(){
   topCats.forEach(k=>{ try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+k+"&mode=total").catch(()=>{}); }catch(e){} });
   try{
     fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+main+"&mode=total&no_increment=1&format=json").then(r=>r.json()).then(j=>{
-      if(j.data&&j.data.record) document.getElementById("resCount").textContent=b.n+"小猫大军+1，现在共 "+j.data.record.total+" 只(/▽＼)";
-    }).catch(()=>{});
-  }catch(e){}
+      const n=(j.data&&j.data.record)?j.data.record.total:null;
+      document.getElementById("resCount").textContent = n!=null ? (b.n+"小猫大军+1，现在共 "+n+" 只(/▽＼)") : (b.n+"小猫大军+1(/▽＼)");
+    }).catch(()=>{ document.getElementById("resCount").textContent=b.n+"小猫大军+1(/▽＼)"; });
+  }catch(e){ document.getElementById("resCount").textContent=b.n+"小猫大军+1(/▽＼)"; }
 }
 
 $("#startBtn").onclick=()=>{ score={}; idx=0; renderQ(); show("quiz"); };
