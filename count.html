@@ -25,39 +25,29 @@ body{background:#F4F2EC;color:#2A2A28;font-family:-apple-system,BlinkMacSystemFo
   <div class="head">
     <div class="num" id="num">—</div>
     <div class="label">人 完 成 测 试</div>
-    <div class="sub" id="sub">加载中…</div>
+    <div class="sub" id="sub">—</div>
   </div>
   <div class="dist-title">各 种 猫 分 布</div>
   <div id="dist"></div>
 </div>
 <script>
+// 数据由 GitHub Actions 每天用 Key 更新，这里内嵌
+const DATA = {"completed":{"total":31582,"daily":108,"up":"09-29 00:23"},"black":{"total":11904,"daily":54,"up":"09-29 00:23"},"golden":{"total":7195,"daily":28,"up":"09-29 00:23"},"silver":{"total":2470,"daily":10,"up":"09-29 00:22"},"cow":{"total":2943,"daily":5,"up":"09-29 00:22"},"ragdoll":{"total":5865,"daily":26,"up":"09-29 00:22"},"siamese":{"total":1804,"daily":6,"up":"09-29 00:18"},"tabby":{"total":3087,"daily":11,"up":"09-29 00:22"},"orange":{"total":3538,"daily":8,"up":"09-29 00:20"},"vote-dogi":{"total":0,"daily":0,"up":""},"vote-xuanxue":{"total":0,"daily":0,"up":"09-28 20:45"},"vote-gufeng":{"total":3,"daily":0,"up":"09-28 23:06"},"vote-xiaomao":{"total":2,"daily":0,"up":"09-28 21:40"}};
 const CATS=[["black","孟买猫"],["golden","金渐层"],["silver","银渐层"],["cow","奶牛猫"],["ragdoll","布偶"],["siamese","暹罗"],["tabby","狸花"],["orange","橘猫"]];
-async function getVal(name){
-  try{
-    const r=await fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+name+"&mode=total&no_increment=1&format=json");
-    const j=await r.json();
-    return j.data && j.data.record ? j.data.record.total : 0;
-  }catch(e){ return 0; }
-}
-async function load(){
-  const total=await getVal("completed");
-  const vals={};
-  for(const [k,n] of CATS){ vals[k]=await getVal(k); }
-  document.getElementById("num").textContent=total;
-  // 今日新增
-  try{
-    const r=await fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=completed&mode=total&no_increment=1&format=json");
-    const j=await r.json();
-    const d=j.data; const daily=d.record.daily; const up=d.record.updated_at||"";
-    document.getElementById("sub").innerHTML=`今日 +${daily} · 最后测试 ${up.replace("T"," ").slice(5,16)}`;
-  }catch(e){}
-  const max=Math.max(1,...Object.values(vals));
-  document.getElementById("dist").innerHTML=CATS.map(([k,n])=>{
-    const v=vals[k]||0;
+
+function render(){
+  const total = DATA.completed && DATA.completed.total || 0;
+  const daily = DATA.completed && DATA.completed.daily || 0;
+  const up = DATA.completed && DATA.completed.up || "";
+  document.getElementById("num").textContent = total;
+  document.getElementById("sub").innerHTML = "今日 +" + daily + " · 更新于 " + up;
+  const max = Math.max(1, ...CATS.map(([k])=> DATA[k] && DATA[k].total || 0));
+  document.getElementById("dist").innerHTML = CATS.map(([k,n])=>{
+    const v = DATA[k] && DATA[k].total || 0;
     return `<div class="row"><span class="name">${n}</span><span class="bar-wrap"><span class="bar" style="width:${Math.round(v/max*100)}%"></span></span><span class="count">${v}</span></div>`;
   }).join("");
 }
-load();
+render();
 </script>
 </body>
 </html>
