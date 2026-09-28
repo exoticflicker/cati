@@ -64,6 +64,7 @@ body{
 .btn:active{transform:scale(.97)}
 .btn.ghost{background:var(--bg);color:var(--ink-1);border:1px solid var(--ink-1);box-shadow:none;font-weight:600;font-size:15px;padding:14px 20px}
 .hint{margin-top:18px;font-size:12px;color:var(--ink-3);letter-spacing:.05em}
+.cover-count{font-size:12px;color:var(--ink-3);margin-top:12px}
 .cover-wave{position:absolute;left:0;right:0;bottom:0;height:110px;pointer-events:none;opacity:.5}
 .cover-wave path{fill:var(--accent-2)}
 
@@ -121,6 +122,7 @@ body{
 .pair-item{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 16px;font-size:15px;color:var(--ink-2);text-align:left;line-height:1.6}
 .pair-item b{color:var(--ink-1);font-weight:600}
 .actions{display:flex;flex-direction:column;gap:10px;margin:24px 24px 0}
+.res-count{font-size:13px;color:var(--ink-2);text-align:center;margin:20px 24px 0}
 .action-row{display:flex;gap:10px}
 .action-row .btn{flex:1}
 .share-note{font-size:12px;color:var(--ink-3);margin-top:10px;text-align:center}
@@ -161,6 +163,7 @@ var _hmt = _hmt || [];
       <div class="cat-stage" id="coverCat"></div>
       <button class="btn" id="startBtn">开始测试</button>
       <div class="hint">1min 测测你是什么性格的小猫</div>
+      <div class="cover-count" id="coverCount">已测试人数：—</div>
     </section>
 
     <section class="screen" id="quiz">
@@ -198,6 +201,7 @@ var _hmt = _hmt || [];
           <div class="pair-item" id="buddyLine"></div>
         </div>
       </div>
+      <div class="res-count" id="resCount"></div>
       <div class="actions">
         <div class="action-row">
           <button class="btn ghost" id="againBtn">再测一次</button>
@@ -303,6 +307,11 @@ function mountCat(id){
   anims[id]=lottie.loadAnimation({container:el, renderer:"svg", loop:true, autoplay:true, animationData:BAD_CAT});
 }
 mountCat("coverCat");
+try{
+  fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=completed&mode=total&no_increment=1&format=json").then(r=>r.json()).then(j=>{
+    if(j.data&&j.data.record) document.getElementById("coverCount").textContent="已测试人数："+j.data.record.total;
+  }).catch(()=>{});
+}catch(e){}
 
 function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
 
@@ -377,6 +386,11 @@ function showResult(){
   try{ _hmt.push(['_trackEvent','test','completed',b.n]); }catch(e){}
   try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=completed&mode=total").catch(()=>{}); }catch(e){}
   topCats.forEach(k=>{ try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+k+"&mode=total").catch(()=>{}); }catch(e){} });
+  try{
+    fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+main+"&mode=total&no_increment=1&format=json").then(r=>r.json()).then(j=>{
+      if(j.data&&j.data.record) document.getElementById("resCount").textContent=b.n+"小猫大军+1，现在共 "+j.data.record.total+" 只(/▽＼)";
+    }).catch(()=>{});
+  }catch(e){}
 }
 
 $("#startBtn").onclick=()=>{ score={}; idx=0; renderQ(); show("quiz"); };
