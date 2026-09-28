@@ -1,0 +1,26 @@
+name: Update Count
+
+on:
+  schedule:
+    - cron: '30 0 * * *'   # 每天 UTC 00:30（北京时间 08:30）自动跑
+  workflow_dispatch:        # 也支持手动触发
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Fetch and update count.html
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+        run: node fetch.js
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add count.html
+          git commit -m "update count data $(date -u +%F)" || echo "无变化，跳过提交"
+          git push
