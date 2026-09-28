@@ -126,6 +126,9 @@ body{
 .action-row{display:flex;gap:10px}
 .action-row .btn{flex:1}
 .share-note{font-size:12px;color:var(--ink-3);margin-top:10px;text-align:center}
+.donate-box{text-align:center;margin:24px 24px 0;padding:20px;background:var(--bg);border:1px solid var(--border)}
+.donate-text{font-size:14px;color:var(--ink-2);margin-bottom:14px;line-height:1.7}
+.donate-img{width:200px;height:200px;object-fit:contain}
 
 #gallery{padding:calc(20px + var(--sat)) 24px calc(24px + var(--sab));overflow-y:auto}
 .gallery-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
@@ -140,6 +143,10 @@ body{
 .g-tag{font-size:11px;color:var(--ink-3);border:1px solid var(--border);padding:2px 8px;border-radius:0}
 .g-desc{font-size:14px;line-height:1.8;color:var(--ink-2)}
 .g-pair{margin-top:10px;font-size:13px;color:var(--ink-3)}
+#vote{padding:calc(20px + var(--sat)) 24px calc(24px + var(--sab));overflow-y:auto}
+.vote-note{font-size:13px;color:var(--ink-3);margin-bottom:16px}
+.vote-item{width:100%;text-align:left;border:1px solid var(--border);background:var(--bg);border-radius:0;padding:16px;font-size:16px;color:var(--ink-1);cursor:pointer;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;font-family:inherit}
+.vote-item .v-count{font-size:13px;color:var(--ink-3)}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.screen{transition:none}}
 </style>
@@ -207,9 +214,14 @@ var _hmt = _hmt || [];
           <button class="btn ghost" id="againBtn">再测一次</button>
           <button class="btn ghost" id="galleryBtn">猫猫图鉴</button>
         </div>
+        <button class="btn ghost" id="voteBtn">🗳️ 投票：下一期做什么</button>
         <button class="btn" id="shareBtn">分享给朋友</button>
       </div>
       <div class="share-note">分享链接会带上你的结果，朋友点开就能看</div>
+      <div class="donate-box">
+        <div class="donate-text">感谢天使宝宝的投喂，欢迎宝宝 0.01🥕 向主播留言</div>
+        <img src="donate.png" class="donate-img" alt="赞赏码">
+      </div>
     </section>
 
     <section class="screen" id="gallery">
@@ -218,6 +230,15 @@ var _hmt = _hmt || [];
         <div class="g-title">猫猫图鉴</div>
       </div>
       <div class="gallery-list" id="galleryList"></div>
+    </section>
+
+    <section class="screen" id="vote">
+      <div class="gallery-head">
+        <button class="g-back" id="voteBack">← 返回</button>
+        <div class="g-title">下一期做什么？</div>
+      </div>
+      <div class="vote-note">投一票，催更你最想测的那个（一人一票）</div>
+      <div class="vote-list" id="voteList"></div>
     </section>
 
   </div>
@@ -317,7 +338,7 @@ function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16&25
 
 let idx=0, score={}, picked=null, answers={}, resultText="";
 const $=s=>document.querySelector(s);
-const screens={cover:$("#cover"),quiz:$("#quiz"),result:$("#result"),gallery:$("#gallery")};
+const screens={cover:$("#cover"),quiz:$("#quiz"),result:$("#result"),gallery:$("#gallery"),vote:$("#vote")};
 function show(name){Object.values(screens).forEach(s=>s.classList.remove("active"));screens[name].classList.add("active");}
 
 function renderQ(){
@@ -414,6 +435,37 @@ function renderGallery(){
 }
 $("#galleryBtn").onclick=()=>{ renderGallery(); show("gallery"); };
 $("#galleryBack").onclick=()=>{ show("result"); };
+
+const VOTES=[["vote-dogi","狗狗版测试（dogi）"],["vote-xuanxue","玄学性格测试（紫微/塔罗）"],["vote-gufeng","古风修仙门派"],["vote-xiaomao","理想型小猫"]];
+async function voteCount(name){
+  try{
+    const r=await fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+name+"&mode=total&no_increment=1&format=json");
+    const j=await r.json();
+    return j.data&&j.data.record?j.data.record.total:0;
+  }catch(e){return 0;}
+}
+async function renderVote(){
+  const list=$("#voteList");
+  const voted=localStorage.getItem("cati_voted");
+  list.innerHTML="";
+  for(const [name,label] of VOTES){
+    const n=await voteCount(name);
+    const b=document.createElement("button");
+    b.className="vote-item";
+    b.innerHTML=`<span>${label}</span><span class="v-count">${n} 票</span>`;
+    b.onclick=()=>{
+      if(voted){ alert("你已经投过啦，谢谢支持！"); return; }
+      localStorage.setItem("cati_voted","1");
+      try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+name+"&mode=total").catch(()=>{}); }catch(e){}
+      b.innerHTML=`<span>${label} ✅ 已投</span><span class="v-count">${n+1} 票</span>`;
+      b.style.borderColor="var(--accent)";
+      list.querySelectorAll(".vote-item").forEach(o=>o.style.pointerEvents="none");
+    };
+    list.appendChild(b);
+  }
+}
+$("#voteBtn").onclick=()=>{ renderVote(); show("vote"); };
+$("#voteBack").onclick=()=>{ show("result"); };
 
 function renderChart(){
   const dims=[["black","慢热"],["golden","温和"],["silver","手欠"],["cow","神经质"],["ragdoll","粘人"],["siamese","服务型"],["tabby","靠谱"],["orange","淡淡的"]];
