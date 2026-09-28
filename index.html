@@ -407,12 +407,7 @@ function showResult(){
   try{ _hmt.push(['_trackEvent','test','completed',b.n]); }catch(e){}
   try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=completed&mode=total").catch(()=>{}); }catch(e){}
   topCats.forEach(k=>{ try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+k+"&mode=total").catch(()=>{}); }catch(e){} });
-  try{
-    fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+main+"&mode=total&no_increment=1&format=json").then(r=>r.json()).then(j=>{
-      const n=(j.data&&j.data.record)?j.data.record.total:null;
-      document.getElementById("resCount").textContent = n!=null ? (b.n+"小猫大军+1，现在共 "+n+" 只(/▽＼)") : (b.n+"小猫大军+1(/▽＼)");
-    }).catch(()=>{ document.getElementById("resCount").textContent=b.n+"小猫大军+1(/▽＼)"; });
-  }catch(e){ document.getElementById("resCount").textContent=b.n+"小猫大军+1(/▽＼)"; }
+  document.getElementById("resCount").textContent=b.n+"小猫大军+1(/▽＼)";
 }
 
 $("#startBtn").onclick=()=>{ score={}; idx=0; renderQ(); show("quiz"); };
