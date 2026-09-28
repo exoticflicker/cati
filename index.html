@@ -219,7 +219,7 @@ var _hmt = _hmt || [];
       </div>
       <div class="share-note">分享链接会带上你的结果，朋友点开就能看</div>
       <div class="donate-box">
-        <div class="donate-text">感谢天使宝宝的投喂，欢迎宝宝 0.01🥕 向主播留言</div>
+        <div class="donate-text">感谢天使宝宝的投喂，鸣谢位等待你来(╹ڡ╹ )爱你呀欧尼</div>
         <img src="donate.png" class="donate-img" alt="赞赏码">
       </div>
     </section>
@@ -436,7 +436,7 @@ function renderGallery(){
 $("#galleryBtn").onclick=()=>{ renderGallery(); show("gallery"); };
 $("#galleryBack").onclick=()=>{ show("result"); };
 
-const VOTES=[["vote-dogi","狗狗版测试（dogi）"],["vote-xuanxue","玄学性格测试（紫微/塔罗）"],["vote-gufeng","古风修仙门派"],["vote-xiaomao","理想型小猫"]];
+const VOTES=[["vote-dogi","所有人保持狗塑！测测你的 dogti"],["vote-xuanxue","神煞篇：红艳煞上身，恋爱脑bicycle：今生君恩还不尽？测测你的恋爱脑指数"],["vote-gufeng","江湖病犯了，无情道第一课扎起单马尾！看看你主修的门派"],["vote-xiaomao","可以0.01🥕向主播许愿~谁想做主播的小股东"]];
 async function voteCount(name){
   try{
     const r=await fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+name+"&mode=total&no_increment=1&format=json");
