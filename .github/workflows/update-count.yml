@@ -5,6 +5,9 @@ on:
     - cron: '30 0 * * *'   # 每天 UTC 00:30（北京时间 08:30）自动跑
   workflow_dispatch:        # 也支持手动触发
 
+permissions:
+  contents: write           # 允许提交更新 count.html
+
 jobs:
   update:
     runs-on: ubuntu-latest
