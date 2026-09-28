@@ -6,19 +6,21 @@
 <title>cati · 数据</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#F4F2EC;color:#2A2A28;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;-webkit-font-smoothing:antialiased;padding:32px 0}
-.wrap{width:100%;max-width:420px;padding:0 28px}
+body{background:#F4F2EC;color:#2A2A28;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;-webkit-font-smoothing:antialiased;padding:36px 0}
+.wrap{width:100%;max-width:440px;padding:0 24px}
 .head{text-align:center;margin-bottom:32px}
 .num{font-size:clamp(64px,16vw,104px);font-weight:700;letter-spacing:-.02em;line-height:1}
 .label{margin-top:12px;font-size:13px;letter-spacing:.3em;color:#7C7B76}
 .sub{margin-top:18px;font-size:12px;color:#9a988f;letter-spacing:.05em}
-.sec-title{font-size:12px;letter-spacing:.2em;color:#9a988f;margin:28px 0 16px}
-.row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.name{width:52px;font-size:13px;color:#2A2A28;flex:0 0 auto;text-align:right}
-.bar-wrap{flex:1;height:8px;background:#EDEAE2;overflow:hidden}
-.bar{height:100%;background:#2A2A28;width:0;transition:width .4s ease}
-.val{width:60px;font-size:12px;color:#7C7B76;flex:0 0 auto;text-align:right}
-.vote-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #EDEAE2;font-size:14px}
+.sec-title{font-size:12px;letter-spacing:.2em;color:#9a988f;margin:32px 0 18px}
+
+.cat-chart{display:flex;align-items:flex-end;gap:10px;height:210px;padding:0 4px}
+.cat-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.cat-bar{width:70%;max-width:26px;background:#2A2A28;transition:height .5s ease}
+.cat-pct{font-size:11px;color:#7C7B76;margin-bottom:5px;font-variant-numeric:tabular-nums}
+.cat-name{font-size:11px;color:#2A2A28;margin-top:7px;letter-spacing:.05em}
+
+.vote-item{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #EDEAE2;font-size:14px}
 .vote-item .vn{color:#2A2A28}
 .vote-item .vc{font-size:13px;color:#7C7B76}
 </style>
@@ -32,13 +34,13 @@ body{background:#F4F2EC;color:#2A2A28;font-family:-apple-system,BlinkMacSystemFo
   </div>
 
   <div class="sec-title">各 种 猫 占 比</div>
-  <div id="dist"></div>
+  <div class="cat-chart" id="dist"></div>
 
   <div class="sec-title">投 票：下 一 期 做 什 么</div>
   <div id="votes"></div>
 </div>
 <script>
-const DATA = {"completed":{"total":31652,"daily":178,"up":"09-29 00:42"},"black":{"total":11932,"daily":82,"up":"09-29 00:41"},"golden":{"total":7208,"daily":41,"up":"09-29 00:42"},"silver":{"total":2474,"daily":14,"up":"09-29 00:39"},"cow":{"total":2944,"daily":6,"up":"09-29 00:38"},"ragdoll":{"total":5883,"daily":44,"up":"09-29 00:42"},"siamese":{"total":1807,"daily":9,"up":"09-29 00:34"},"tabby":{"total":3092,"daily":16,"up":"09-29 00:40"},"orange":{"total":3541,"daily":11,"up":"09-29 00:42"},"vote-dogi":{"total":23,"daily":5,"up":"09-29 00:29"},"vote-xuanxue":{"total":0,"daily":0,"up":""},"vote-gufeng":{"total":3,"daily":0,"up":"09-28 23:06"},"vote-xiaomao":{"total":2,"daily":0,"up":"09-28 21:40"}};
+const DATA = __DATA__;
 const CATS=[["black","孟买猫"],["golden","金渐层"],["silver","银渐层"],["cow","奶牛猫"],["ragdoll","布偶"],["siamese","暹罗"],["tabby","狸花"],["orange","橘猫"]];
 const VOTES=[["vote-dogi","所有人保持狗塑！测测你的 dogti"],["vote-xuanxue","神煞篇：红艳煞 · 恋爱脑指数"],["vote-gufeng","江湖病犯了 · 看看你主修的门派"],["vote-xiaomao","0.01🥕 向主播许愿 · 小股东"]];
 
@@ -47,18 +49,15 @@ function render(){
   document.getElementById("num").textContent = completed.total || 0;
   document.getElementById("sub").innerHTML = "今日 +" + (completed.daily||0) + " · 更新于 " + (completed.up||"");
 
-  // 猫占比
   const totals = CATS.map(([k])=> DATA[k] ? DATA[k].total : 0);
   const sum = totals.reduce((a,b)=>a+b, 0) || 1;
-  const maxPct = Math.max(...totals) / sum * 100;
   document.getElementById("dist").innerHTML = CATS.map(([k,n],i)=>{
     const v = totals[i];
     const pct = Math.round(v / sum * 100);
-    const h = Math.round(v / sum * 100 / maxPct * 100);
-    return `<div class="row"><span class="name">${n}</span><span class="bar-wrap"><span class="bar" style="width:${h}%"></span></span><span class="val">${pct}% (${v})</span></div>`;
+    const h = Math.max(2, Math.round(v / sum * 100));
+    return `<div class="cat-col"><div class="cat-pct">${pct}%</div><div class="cat-bar" style="height:${h}%"></div><div class="cat-name">${n}</div></div>`;
   }).join("");
 
-  // 投票
   document.getElementById("votes").innerHTML = VOTES.map(([k,label])=>{
     const v = DATA[k] ? DATA[k].total : 0;
     return `<div class="vote-item"><span class="vn">${label}</span><span class="vc">${v} 票</span></div>`;
