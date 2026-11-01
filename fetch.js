@@ -1,4 +1,4 @@
-// 每天用 apizero Key 查数据，更新 count.html 的内嵌数据
+// 每天用 apizero Key 查数据，更新 count.html 的内嵌数据 + 把 Key 注入页面 + 同步首页兜底数字
 // 容错：查到 0 / 失败就重试，重试仍失败则保留昨天的旧值（防止漂移把数据抹成 0）
 const fs = require('fs');
 const API_KEY = process.env.API_KEY;
@@ -41,8 +41,21 @@ async function fetchOne(name){
       data[name] = { total: 0, daily: 0, up: "" };
     }
   }
+
+  // 1) count.html：写入新数据 + 注入 Key
   const html = fs.readFileSync('count.html', 'utf8');
-  const out = html.replace(/const DATA = \{.*?\};/, 'const DATA = ' + JSON.stringify(data) + ';');
+  let out = html.replace(/const DATA = \{.*?\};/, 'const DATA = ' + JSON.stringify(data) + ';');
+  out = out.replace(/const API_KEY = "[^"]*";/, 'const API_KEY = "' + API_KEY + '";');
   fs.writeFileSync('count.html', out);
+
+  // 2) index.html：注入 Key + 把首页封面兜底数字刷成最新
+  const idx = fs.readFileSync('index.html', 'utf8');
+  let out2 = idx.replace(/const API_KEY = "[^"]*";/, 'const API_KEY = "' + API_KEY + '";');
+  if(data.completed && data.completed.total > 0){
+    out2 = out2.replace(/已测试人数：\d+/, '已测试人数：' + data.completed.total);
+  }
+  fs.writeFileSync('index.html', out2);
+
+  fs.writeFileSync('count.json', JSON.stringify(data));
   console.log('updated, completed =', data.completed.total, ', 黑猫 =', data.black.total);
 })();

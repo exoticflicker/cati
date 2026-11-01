@@ -43,6 +43,26 @@ body{background:#F4F2EC;color:#2A2A28;font-family:-apple-system,BlinkMacSystemFo
 const DATA = {"completed":{"total":1974310,"daily":45561,"up":"11-01 04:38"},"black":{"total":703565,"daily":14624,"up":"11-01 04:38"},"golden":{"total":465530,"daily":9474,"up":"11-01 04:38"},"silver":{"total":146142,"daily":3088,"up":"11-01 04:38"},"cow":{"total":153601,"daily":3130,"up":"11-01 04:38"},"ragdoll":{"total":408384,"daily":11152,"up":"11-01 04:38"},"siamese":{"total":102959,"daily":2276,"up":"11-01 04:36"},"tabby":{"total":159931,"daily":3045,"up":"11-01 04:37"},"orange":{"total":208159,"daily":2550,"up":"11-01 04:38"},"vote-dogi":{"total":22358,"daily":1231,"up":"11-01 04:38"},"vote-xuanxue":{"total":4974,"daily":286,"up":"11-01 04:37"},"vote-gufeng":{"total":11602,"daily":279,"up":"11-01 04:37"},"vote-xiaomao":{"total":702,"daily":47,"up":"11-01 04:05"}};
 const CATS=[["black","孟买猫"],["golden","金渐层"],["silver","银渐层"],["cow","奶牛猫"],["ragdoll","布偶"],["siamese","暹罗"],["tabby","狸花"],["orange","橘猫"]];
 const VOTES=[["vote-dogi","所有人保持狗塑！测测你的 dogti"],["vote-xuanxue","神煞篇：红艳煞 · 恋爱脑指数"],["vote-gufeng","江湖病犯了 · 看看你主修的门派"],["vote-xiaomao","0.01🥕 向主播许愿 · 小股东"]];
+const API_KEY = "__API_KEY__";
+const ITEMS = ["completed","black","golden","silver","cow","ragdoll","siamese","tabby","orange","vote-dogi","vote-xuanxue","vote-gufeng","vote-xiaomao"];
+async function refresh(){
+  const results = await Promise.all(ITEMS.map(async name=>{
+    try{
+      const r = await fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+name+"&mode=total&no_increment=1&format=json&api_key="+API_KEY);
+      const j = await r.json();
+      const d = j && j.data && j.data.record;
+      if(d && typeof d.total === "number" && d.total > 0){
+        return {name, total:d.total, daily:d.daily, up:(d.updated_at||"").replace("T"," ").slice(5,16)};
+      }
+    }catch(e){}
+    return null;
+  }));
+  let changed=false;
+  for(const item of results){
+    if(item){ DATA[item.name]={total:item.total,daily:item.daily,up:item.up}; changed=true; }
+  }
+  if(changed) render();
+}
 
 function render(){
   const completed = DATA.completed || {};
@@ -64,6 +84,7 @@ function render(){
   }).join("");
 }
 render();
+refresh();
 </script>
 </body>
 </html>
