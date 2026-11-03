@@ -7,16 +7,17 @@ if (!API_KEY) { console.error('缺少 API_KEY 环境变量'); process.exit(1); }
 const ITEMS = ["completed","black","golden","silver","cow","ragdoll","siamese","tabby","orange","vote-dogi","vote-xuanxue","vote-gufeng","vote-xiaomao"];
 
 async function fetchOne(name){
-  for(let i=0;i<3;i++){
+  for(let i=0;i<10;i++){
     try{
       const r = await fetch(`https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=${name}&mode=total&no_increment=1&format=json&api_key=${API_KEY}`);
+      if(r.status === 429){ await new Promise(x=>setTimeout(x, 8000*(i+1))); continue; }  // 限流，指数退避
       const j = await r.json();
       const d = j.data;
       if(d && d.record && typeof d.record.total === 'number' && d.record.total > 0){
         return { total: d.record.total, daily: d.record.daily, up: (d.record.updated_at||"").replace("T"," ").slice(5,16) };
       }
     }catch(e){}
-    await new Promise(r=>setTimeout(r,1500));
+    await new Promise(r=>setTimeout(r, 3000*(i+1)));
   }
   return null;
 }
