@@ -40,28 +40,19 @@ body{background:#F4F2EC;color:#2A2A28;font-family:-apple-system,BlinkMacSystemFo
   <div id="votes"></div>
 </div>
 <script>
-const DATA = {"completed":{"total":2048401,"daily":34819,"up":"11-03 19:47"},"black":{"total":728968,"daily":12287,"up":"11-03 19:49"},"golden":{"total":484245,"daily":8591,"up":"11-03 19:49"},"silver":{"total":146142,"daily":0,"up":"11-01 04:38"},"cow":{"total":160148,"daily":3018,"up":"11-03 19:59"},"ragdoll":{"total":426379,"daily":8493,"up":"11-03 20:01"},"siamese":{"total":102963,"daily":4,"up":"11-02 03:47"},"tabby":{"total":166520,"daily":3024,"up":"11-03 20:08"},"orange":{"total":216615,"daily":4012,"up":"11-03 20:10"},"vote-dogi":{"total":23160,"daily":368,"up":"11-03 20:11"},"vote-xuanxue":{"total":5151,"daily":98,"up":"11-03 20:09"},"vote-gufeng":{"total":11804,"daily":86,"up":"11-03 20:06"},"vote-xiaomao":{"total":732,"daily":11,"up":"11-03 19:37"}};
+const DATA = {"completed":{"total":1974367,"daily":1,"up":"2026-11-03 12:56"},"black":{"total":703589,"daily":1,"up":"2026-11-03 12:56"},"golden":{"total":465541,"daily":0,"up":""},"silver":{"total":146142,"daily":0,"up":""},"cow":{"total":159307,"daily":0,"up":""},"ragdoll":{"total":424166,"daily":0,"up":""},"siamese":{"total":102963,"daily":0,"up":""},"tabby":{"total":161658,"daily":0,"up":""},"orange":{"total":208167,"daily":0,"up":""},"vote-dogi":{"total":23082,"daily":0,"up":""},"vote-xuanxue":{"total":4974,"daily":0,"up":""},"vote-gufeng":{"total":11665,"daily":0,"up":""},"vote-xiaomao":{"total":702,"daily":0,"up":""}};
 const CATS=[["black","孟买猫"],["golden","金渐层"],["silver","银渐层"],["cow","奶牛猫"],["ragdoll","布偶"],["siamese","暹罗"],["tabby","狸花"],["orange","橘猫"]];
 const VOTES=[["vote-dogi","所有人保持狗塑！测测你的 dogti"],["vote-xuanxue","神煞篇：红艳煞 · 恋爱脑指数"],["vote-gufeng","江湖病犯了 · 看看你主修的门派"],["vote-xiaomao","0.01🥕 向主播许愿 · 小股东"]];
-const API_KEY = "sk_live_afd6e949636c37ce34367173c483ad0cefcd89feea0f56fd";
 const ITEMS = ["completed","black","golden","silver","cow","ragdoll","siamese","tabby","orange","vote-dogi","vote-xuanxue","vote-gufeng","vote-xiaomao"];
 async function refresh(){
-  const results = await Promise.all(ITEMS.map(async name=>{
-    try{
-      const r = await fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+name+"&mode=total&no_increment=1&format=json&api_key="+API_KEY);
-      const j = await r.json();
-      const d = j && j.data && j.data.record;
-      if(d && typeof d.total === "number" && d.total > 0){
-        return {name, total:d.total, daily:d.daily, up:(d.updated_at||"").replace("T"," ").slice(5,16)};
-      }
-    }catch(e){}
-    return null;
-  }));
-  let changed=false;
-  for(const item of results){
-    if(item){ DATA[item.name]={total:item.total,daily:item.daily,up:item.up}; changed=true; }
-  }
-  if(changed) render();
+  try{
+    const j = await fetch("https://cati-counter.cati-counter.workers.dev/all").then(r=>r.json());
+    let changed=false;
+    for(const name of ITEMS){
+      if(j[name]){ DATA[name]={total:j[name].total,daily:j[name].daily,up:j[name].up}; changed=true; }
+    }
+    if(changed) render();
+  }catch(e){}
 }
 
 function render(){

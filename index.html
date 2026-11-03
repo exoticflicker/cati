@@ -173,7 +173,7 @@ var _hmt = _hmt || [];
       <div class="cat-stage" id="coverCat"></div>
       <button class="btn" id="startBtn">开始测试</button>
       <div class="hint">1min 测测你是什么性格的小猫</div>
-      <div class="cover-count" id="coverCount">已测试人数：2048401</div>
+      <div class="cover-count" id="coverCount">已测试人数：1974367</div>
       <div class="watermark">
         <div class="wm-warn">市面上要求截屏的都是盗版链接，谨防受骗！</div>
         <div>支持正版，才能持续创作！ψ(｀∇´)ψ</div>
@@ -337,7 +337,7 @@ const QUIZ = [
 ];
 
 const anims = {};
-const API_KEY = "sk_live_afd6e949636c37ce34367173c483ad0cefcd89feea0f56fd";
+const COUNTER = "https://cati-counter.cati-counter.workers.dev";
 function mountCat(id){
   const el=document.getElementById(id);
   if(!el||!window.lottie) return;
@@ -347,8 +347,8 @@ function mountCat(id){
 }
 mountCat("coverCat");
 try{
-  fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=completed&mode=total&no_increment=1&format=json&api_key="+API_KEY).then(r=>r.json()).then(j=>{
-    if(j.data&&j.data.record) document.getElementById("coverCount").textContent="已测试人数："+j.data.record.total;
+  fetch(COUNTER+"/all").then(r=>r.json()).then(j=>{
+    if(j.completed) document.getElementById("coverCount").textContent="已测试人数："+j.completed.total;
   }).catch(()=>{});
 }catch(e){}
 
@@ -423,8 +423,7 @@ function showResult(){
   mountCat("resCat");
   show("result");
   try{ _hmt.push(['_trackEvent','test','completed',b.n]); }catch(e){}
-  try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name=completed&mode=total&api_key="+API_KEY).catch(()=>{}); }catch(e){}
-  topCats.forEach(k=>{ try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+k+"&mode=total&api_key="+API_KEY).catch(()=>{}); }catch(e){} });
+  try{ fetch(COUNTER+"/inc",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(["completed",...topCats])}).catch(()=>{}); }catch(e){}
   document.getElementById("resCount").textContent=b.n+"小猫大军+1(/▽＼)";
 }
 
@@ -462,7 +461,7 @@ function renderVote(){
     b.onclick=()=>{
       if(voted){ alert("你已经投过啦，谢谢支持！"); return; }
       localStorage.setItem("cati_voted","1");
-      try{ fetch("https://v1.apizero.cn/api/visits-counter?site=exoticflicker-cati&name="+name+"&mode=total&api_key="+API_KEY).catch(()=>{}); }catch(e){}
+      try{ fetch(COUNTER+"/inc",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify([name])}).catch(()=>{}); }catch(e){}
       b.innerHTML=`<span>${label} ✅ 已投</span>`;
       b.style.borderColor="var(--accent)";
       list.querySelectorAll(".vote-item").forEach(o=>o.style.pointerEvents="none");
